@@ -19,20 +19,28 @@ C.abs_dir = osp.realpath(".")
 # Dataset config
 """Dataset Path"""
 C.dataset_name = 'custom'
-C.dataset_path = '/media/kkk/T7_Shield1/for_mid/20221130/total_1130'
+C.dataset_path = '/media/asura/T7_Shield_1/for_mid/20221130/total_1130'
 C.rgb_root_folder = osp.join(C.dataset_path, 'img')
 C.rgb_format = '.jpg'
-C.gt_root_folder = osp.join(C.dataset_path, 'gray_mask')
+# C.gt_root_folder = osp.join(C.dataset_path, 'gray_mask')
+C.gt_root_folder = osp.join(C.dataset_path, 'mask')
 C.gt_format = '.png'
 C.gt_transform = False
 # True when label 0 is invalid, you can also modify the function _transform_gt in dataloader.RGBXDataset
 # True for most dataset valid, Faslse for MFNet(?)
-C.x_root_folder = osp.join(C.dataset_path, 'lidar_projected')
-C.x_format = '.png'
+# C.x_root_folder = osp.join(C.dataset_path, 'lidar_projected')
+# C.x_format = '.png'
+C.x_root_folder = osp.join(C.dataset_path, 'lidar')
+C.x_format = '.pcd'
 C.x_is_single_channel = False # True for raw depth, thermal and aolp/dolp(not aolp/dolp tri) input
 C.train_source = osp.join(C.dataset_path, "train.txt")
 C.eval_source = osp.join(C.dataset_path, "val.txt")
 C.test_source = osp.join(C.dataset_path, "test.txt")
+
+# Need to resize 
+# Note this False if you don't want to change size from original one
+C.resize_shape = np.array([1280, 1920])
+
 C.is_test = False
 # C.num_train_imgs = 1545
 # C.num_eval_imgs = 660

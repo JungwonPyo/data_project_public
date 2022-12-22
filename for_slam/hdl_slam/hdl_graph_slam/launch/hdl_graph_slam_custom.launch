@@ -32,7 +32,7 @@
     <param name="base_link_frame" value="base_link" />
     <!-- distance filter -->
     <param name="use_distance_filter" value="true" />
-    <param name="distance_near_thresh" value="0.1" />
+    <param name="distance_near_thresh" value="1.0" />
     <param name="distance_far_thresh" value="100.0" />
     <!-- NONE, VOXELGRID, or APPROX_VOXELGRID -->
     <param name="downsample_method" value="VOXELGRID" />
@@ -42,7 +42,7 @@
     <param name="statistical_mean_k" value="30" />
     <param name="statistical_stddev" value="1.2" />
     <param name="radius_radius" value="0.5" />
-    <param name="radius_min_neighbors" value="2" />
+    <param name="radius_min_neighbors" value="3" />
   </node>
 
   <!-- scan_matching_odometry_nodelet -->
@@ -60,13 +60,13 @@
     <param name="downsample_method" value="NONE" />
     <param name="downsample_resolution" value="0.1" />
     <!-- ICP, GICP, NDT, GICP_OMP, NDT_OMP, FAST_GICP(recommended), or FAST_VGICP -->
-    <param name="registration_method" value="FAST_GICP" />
+    <param name="registration_method" value="FAST_VGICP" />
     <param name="reg_num_threads" value="0" />
     <param name="reg_transformation_epsilon" value="0.01"/>
-    <param name="reg_maximum_iterations" value="64"/>
+    <param name="reg_maximum_iterations" value="128"/>
     <param name="reg_max_correspondence_distance" value="2.5"/>
-    <param name="reg_max_optimizer_iterations" value="20"/>
-    <param name="reg_use_reciprocal_correspondences" value="false"/>
+    <param name="reg_max_optimizer_iterations" value="50"/>
+    <param name="reg_use_reciprocal_correspondences" value="true"/>
     <param name="reg_correspondence_randomness" value="20"/>
     <param name="reg_resolution" value="1.0" />
     <param name="reg_nn_search_method" value="DIRECT7" />
@@ -140,18 +140,18 @@
     <param name="floor_edge_stddev" value="10.0" />
     <!-- scan matching -->
     <!-- robust kernels: NONE, Cauchy, DCS, Fair, GemanMcClure, Huber, PseudoHuber, Saturated, Tukey, Welsch -->
-    <param name="odometry_edge_robust_kernel" value="NONE" />
-    <param name="odometry_edge_robust_kernel_size" value="1.0" />
+    <param name="odometry_edge_robust_kernel" value="GemanMcClure" />
+    <param name="odometry_edge_robust_kernel_size" value="1.5" />
     <param name="loop_closure_edge_robust_kernel" value="Huber" />
-    <param name="loop_closure_edge_robust_kernel_size" value="1.0" />
+    <param name="loop_closure_edge_robust_kernel_size" value="1.5" />
     <param name="use_const_inf_matrix" value="false" />
     <param name="const_stddev_x" value="0.5" />
     <param name="const_stddev_q" value="0.1" />
     <param name="var_gain_a" value="20.0" />
     <param name="min_stddev_x" value="0.1" />
     <param name="max_stddev_x" value="5.0" />
-    <param name="min_stddev_q" value="0.05" />
-    <param name="max_stddev_q" value="0.2" />
+    <param name="min_stddev_q" value="0.1" />
+    <param name="max_stddev_q" value="0.5" />
     <!-- update params -->
     <param name="graph_update_interval" value="3.0" />
     <param name="map_cloud_update_interval" value="10.0" />

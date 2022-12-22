@@ -30,8 +30,8 @@ from config import config
 from config import update_config
 from core.criterion import CrossEntropy, OhemCrossEntropy
 from core.function import train, validate
-from utils.modelsummary import get_model_summary
-from utils.utils import create_logger, FullModel
+from core_utils.modelsummary import get_model_summary
+from core_utils.utils import create_logger, FullModel
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train segmentation network')
@@ -53,7 +53,7 @@ def parse_args():
     return args
 
 def get_sampler(dataset):
-    from utils.distributed import is_distributed
+    from core_utils.distributed import is_distributed
     if is_distributed():
         from torch.utils.data.distributed import DistributedSampler
         return DistributedSampler(dataset)

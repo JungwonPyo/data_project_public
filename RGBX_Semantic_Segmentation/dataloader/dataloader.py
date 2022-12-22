@@ -66,7 +66,8 @@ def get_train_loader(engine, dataset):
                     'class_names': config.class_names,
                     'train_source': config.train_source,
                     'eval_source': config.eval_source,
-                    'class_names': config.class_names}
+                    'class_names': config.class_names,
+                    'resize_shape': config.resize_shape}
     train_preprocess = TrainPre(config.norm_mean, config.norm_std)
 
     train_dataset = dataset(data_setting, "train", train_preprocess, config.batch_size * config.niters_per_epoch)

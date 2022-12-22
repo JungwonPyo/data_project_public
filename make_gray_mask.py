@@ -1,4 +1,4 @@
-from utils.detectron2_dataloader import *
+from core_utils.detectron2_dataloader import *
 
 if __name__ == '__main__':
 

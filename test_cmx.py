@@ -165,7 +165,8 @@ if __name__ == "__main__":
                     'train_source': config.train_source,
                     # 'eval_source': config.eval_source,
                     'eval_source': config.test_source,
-                    'class_names': config.class_names}
+                    'class_names': config.class_names,
+                    'resize_shape': config.resize_shape}
     val_pre = ValPre()
     dataset = RGBXDataset(data_setting, 'val', val_pre)
  

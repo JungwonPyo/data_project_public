@@ -171,6 +171,7 @@ def main():
                         list_path=config.DATASET.TEST_SET,
                         num_samples=None,
                         num_classes=config.DATASET.NUM_CLASSES,
+                        resize_shape=config.DATASET.RESIZE_SHAPE,
                         multi_scale=False,
                         flip=False,
                         ignore_label=config.TRAIN.IGNORE_LABEL,

@@ -15,6 +15,8 @@ from torch.nn import functional as F
 
 from .base_dataset import BaseDataset
 
+from core_utils.detectron2_dataloader import *
+
 class Custom(BaseDataset):
     def __init__(self, 
                  root, 
@@ -29,7 +31,8 @@ class Custom(BaseDataset):
                  downsample_rate=1,
                  scale_factor=16,
                  mean=[0.485, 0.456, 0.406], 
-                 std=[0.229, 0.224, 0.225]):
+                 std=[0.229, 0.224, 0.225],
+                 resize_shape=[1280, 1920]):
 
         super(Custom, self).__init__(ignore_label, base_size,
                 crop_size, downsample_rate, scale_factor, mean, std,)
@@ -40,6 +43,8 @@ class Custom(BaseDataset):
 
         self.multi_scale = multi_scale
         self.flip = flip
+        
+        self.resize_shape = np.asarray(resize_shape)
         
         self.img_list = [line.strip().split() for line in open(root+list_path)]
 
@@ -180,22 +185,39 @@ class Custom(BaseDataset):
         #                    cv2.IMREAD_COLOR)
         image = cv2.imread(os.path.join(self.root, item["img"]),
                            cv2.IMREAD_COLOR)
-        size = image.shape
+        
+        if self.resize_shape.any():
+            image = cv2.resize(
+                image,
+                (self.resize_shape[1], self.resize_shape[0])
+            )
 
         if 'test' in self.list_path:
+            
+            size = image.shape
+            
             image = self.input_transform(image)
             image = image.transpose((2, 0, 1))
 
-            label = cv2.imread(os.path.join(self.root, item["label"]),
-                           cv2.IMREAD_GRAYSCALE)
+            # label = cv2.imread(os.path.join(self.root, item["label"]),
+            #                cv2.IMREAD_GRAYSCALE)
+            # label = self.convert_label(label)
+            label = make_one_gray_mask(os.path.join(
+                self.root, item["label"]), self.resize_shape)
             label = self.convert_label(label)
 
             return image.copy(), label.copy(), np.array(size), name
 
         # label = cv2.imread(os.path.join(self.root,'cityscapes',item["label"]),
         #                    cv2.IMREAD_GRAYSCALE)
-        label = cv2.imread(os.path.join(self.root, item["label"]),
-                           cv2.IMREAD_GRAYSCALE)
+        # label = cv2.imread(os.path.join(self.root, item["label"]),
+        #                    cv2.IMREAD_GRAYSCALE)
+        # label = self.convert_label(label)
+        
+        size = image.shape
+        
+        label = make_one_gray_mask(os.path.join(
+            self.root, item["label"]), self.resize_shape)
         label = self.convert_label(label)
 
         image, label = self.gen_sample(image, label, 

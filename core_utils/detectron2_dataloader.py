@@ -6,6 +6,14 @@ from tqdm import tqdm
 import copy
 import random
 import matplotlib.pyplot as plt
+
+# from detectron2 import model_zoo
+# from detectron2.engine import DefaultPredictor
+# from detectron2.config import get_cfg
+# from detectron2.utils.visualizer import Visualizer
+# from detectron2.data import MetadataCatalog, DatasetCatalog
+# from detectron2.structures import BoxMode
+
 from pycocotools import mask as coco_mask
 
 from multiprocessing import Pool
@@ -217,6 +225,41 @@ def make_gray_masks_from_color_masks_parallel_process(
     print('Done', flush=True)
     
     
+def make_one_gray_mask(
+    file_path,
+    reshape_size=False
+):
+
+    each_mask = cv2.imread(file_path)
+    
+    if reshape_size.any():
+        each_mask = cv2.resize(
+            each_mask, 
+            (reshape_size[1], reshape_size[0]),
+            interpolation=cv2.INTER_NEAREST
+            )
+
+    total_gray_mask = np.zeros(np.shape(each_mask)[:2], dtype=np.uint8)
+
+    for ind, each_key in enumerate(class_info.keys()):
+
+        cur_key_color = np.asarray(class_info[each_key])
+        cur_key_color = np.expand_dims(cur_key_color, axis=(0, 1))
+
+        temp_mask = np.where(
+            each_mask == cur_key_color, 1, 0
+        )
+        temp_mask = np.where(
+            np.sum(temp_mask, axis=-1) == 3, ind, 0
+        )
+
+        total_gray_mask += temp_mask.astype(np.uint8)
+
+    if np.max(total_gray_mask) >= len(class_info):
+        print('Label something wrong !')
+        
+    return total_gray_mask
+    
 def for_each_parallel_make_gray(
     each,
     mask_path,
@@ -275,6 +318,29 @@ def make_gray_masks_from_color_masks_parallel_pool(
         The multiprocessing.Pool is generally used for heterogeneous tasks, whereas multiprocessing.Process is generally used for homogeneous tasks.
     '''
 
+    # with Pool(processes=MAX_WORKERS) as pool:
+    #     results = tqdm(
+    #         pool.imap_unordered(
+    #             for_each_parallel_make_gray, 
+    #             all_mask_lists, 
+    #             chunksize=CHUNK_SIZE
+    #             ),
+    #         total=len(all_mask_lists),
+    #     )  
+    #     # 'total' is redundant here but can be useful
+    #     # when the size of the iterable is unobvious
+    
+    #     for result in results:
+    #         ...
+    #         # print(result)
+    
+    # parmap.map(
+    #     for_each_parallel_make_gray, 
+    #     all_mask_lists, 
+    #     pm_pbar=True,
+    #     pm_processes=MAX_WORKERS
+    #     )
+
     parmap.starmap(
         for_each_parallel_make_gray, 
         all_mask_lists, 
@@ -321,6 +387,25 @@ def get_parking_dicts(img_path, mask_path):
         
     return dataset_dicts
 
+def register_metadata(
+    name, 
+    dicts_class,
+    class_info
+    ):
+    DatasetCatalog.register(name, dicts_class)
+    
+    names = []
+    colors = []
+    for key in class_info.keys():
+        names.append(key)
+        colors.append(tuple(class_info[key]))
+    
+    MetadataCatalog.get(name).stuff_classes = names
+    MetadataCatalog.get(name).stuff_colors = colors
+    
+    # dataset_metadata = MetadataCatalog.get("%s_train" % (name))
+    # return dataset_metadata
+
 def get_unique_colors_from_all_data(
     file_list
 ):
@@ -364,5 +449,72 @@ def get_img_list_from_path(path, extension='.png', full_path=True):
 
     return return_list
 
+
+if __name__ == '__main__':
+    
+    ''' Set metadata again '''
+    train_img_path = '/media/asura/T7 Shield/for_mid/data/merged/train/img'
+    train_color_mask_path = '/media/asura/T7 Shield/for_mid/data/merged/train/mask'
+    train_gray_mask_path = '/media/asura/T7 Shield/for_mid/data/merged/train/gray_mask'
+    train_turn_mask_path = '/media/asura/T7 Shield/for_mid/data/merged/train/turn_mask'
+
+    val_img_path = '/media/asura/T7 Shield/for_mid/data/merged/val/img'
+    val_color_mask_path = '/media/asura/T7 Shield/for_mid/data/merged/val/mask'
+    val_gray_mask_path = '/media/asura/T7 Shield/for_mid/data/merged/val/gray_mask'
+    val_turn_mask_path = '/media/asura/T7 Shield/for_mid/data/merged/val/turn_mask'
+
+    # make_gray_masks_from_color_masks(train_color_mask_path, train_gray_mask_path)
+    # make_gray_masks_from_color_masks(val_color_mask_path, val_gray_mask_path)
+
+    # make_turncated_masks_from_gray_masks(
+    #     train_gray_mask_path, train_turn_mask_path)
+    # make_turncated_masks_from_gray_masks(
+    #     val_gray_mask_path, val_turn_mask_path)
+
+    train_dataset_name = "parking_train"
+    val_dataset_name = "parking_val"
+
+    for d in ["train", "val"]:
+        DatasetCatalog.register(
+            "parking_" + d, lambda d=d: get_parking_dicts(
+                "/media/asura/T7 Shield/for_mid/data/merged/" + d + "/img",
+                # "/media/asura/T7 Shield/for_mid/data/merged/" + d + "/gray_mask"
+                "/media/asura/T7 Shield/for_mid/data/merged/" + d + "/turn_mask"
+            )
+        )
+
+    names = []
+    colors = []
+    # for key in class_info.keys():
+    for key in turncated_class_info.keys():
+        names.append(key)
+        # colors.append(tuple(class_info[key]))
+        colors.append(tuple(turncated_class_info[key]))
+
+    MetadataCatalog.get(train_dataset_name).stuff_classes = names
+    MetadataCatalog.get(train_dataset_name).stuff_colors = colors
+    MetadataCatalog.get(train_dataset_name).ignore_label = 20
+    MetadataCatalog.get(
+        train_dataset_name).evaluator_type = "sem_seg"
+    MetadataCatalog.get(val_dataset_name).stuff_classes = names
+    MetadataCatalog.get(val_dataset_name).stuff_colors = colors
+    MetadataCatalog.get(val_dataset_name).ignore_label = 20
+    MetadataCatalog.get(
+        val_dataset_name).evaluator_type = "sem_seg"
+    ''' End metadata '''
+    
+    dataset_dicts = get_parking_dicts(
+        train_img_path,
+        # train_gray_mask_path
+        train_turn_mask_path
+        )
+    
+    for d in random.sample(dataset_dicts, 3):
+        img = cv2.imread(d["file_name"])
+        visualizer = Visualizer(
+            img[:, :, ::-1], metadata=MetadataCatalog.get(train_dataset_name), scale=0.5)
+        out = visualizer.draw_dataset_dict(d)
+        plt.imshow(cv2.resize(out.get_image(), (1280, 960)))
+        plt.show()
     
     

@@ -4,7 +4,7 @@ import cv2
 # import tqdm
 from tqdm import tqdm
 import open3d as o3d
-from utils.preprocessing import preprocessing
+from core_utils.preprocessing import preprocessing
 
 import matplotlib.pyplot as plt
 

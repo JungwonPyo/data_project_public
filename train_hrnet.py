@@ -73,7 +73,7 @@ def parse_args():
 
 
 def get_sampler(dataset):
-    from utils.distributed import is_distributed
+    from core_utils.distributed import is_distributed
     if is_distributed():
         from torch.utils.data.distributed import DistributedSampler
         return DistributedSampler(dataset)
@@ -144,6 +144,7 @@ def main():
         list_path=config.DATASET.TRAIN_SET,
         num_samples=None,
         num_classes=config.DATASET.NUM_CLASSES,
+        resize_shape=config.DATASET.RESIZE_SHAPE,
         multi_scale=config.TRAIN.MULTI_SCALE,
         flip=config.TRAIN.FLIP,
         ignore_label=config.TRAIN.IGNORE_LABEL,
@@ -169,6 +170,7 @@ def main():
             list_path=config.DATASET.EXTRA_TRAIN_SET,
             num_samples=None,
             num_classes=config.DATASET.NUM_CLASSES,
+            resize_shape=config.DATASET.RESIZE_SHAPE,
             multi_scale=config.TRAIN.MULTI_SCALE,
             flip=config.TRAIN.FLIP,
             ignore_label=config.TRAIN.IGNORE_LABEL,
@@ -194,6 +196,7 @@ def main():
         list_path=config.DATASET.TEST_SET,
         num_samples=config.TEST.NUM_SAMPLES,
         num_classes=config.DATASET.NUM_CLASSES,
+        resize_shape=config.DATASET.RESIZE_SHAPE,
         multi_scale=False,
         flip=False,
         ignore_label=config.TRAIN.IGNORE_LABEL,

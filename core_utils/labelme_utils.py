@@ -320,6 +320,10 @@ def get_all_from_json(
     
 if __name__ == "__main__":
     
+    # base_path = '/home/asura/Downloads/20220829anno/data/exhibits'
+    # base_path = '/home/asura/Downloads/20220829anno/data/sewer'
+    # base_path = './dataset/20220908'
+    # class_list_path = './dataset/classes_20220908.txt'
     base_path = './dataset/20220908_1'
     class_list_path = './dataset/classes_20220908_1.txt'
     

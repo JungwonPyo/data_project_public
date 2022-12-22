@@ -27,8 +27,8 @@ import datasets
 from config import config
 from config import update_config
 from core.function import testval, test
-from utils.modelsummary import get_model_summary
-from utils.utils import create_logger, FullModel
+from core_utils.modelsummary import get_model_summary
+from core_utils.utils import create_logger, FullModel
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train segmentation network')

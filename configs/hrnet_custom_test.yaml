@@ -11,14 +11,11 @@ PRINT_FREQ: 10
 
 DATASET:
   DATASET: custom
-  # DATASET: cityscapes
   ROOT: ''
-  # TEST_SET: '/media/asura/T7_Shield/for_mid/20221102/total_1102/train/train_list.lst'
-  # TRAIN_SET: '/media/asura/T7_Shield/for_mid/20221102/total_1102/val/val_list.lst'
-  TRAIN_SET: '/media/kkk/T7_Shield/for_mid/20221116/total_1116/for_training/train/train_list.lst'
-  # TEST_SET: '/media/kkk/T7_Shield/for_mid/20221116/total_1116/for_training/val/val_list.lst'
-  TEST_SET: '/media/kkk/T7_Shield/for_mid/20221116/total_1116/for_training/test/test_list.lst'
+  TRAIN_SET: '/media/asura/T7_Shield_1/for_mid/20221130/total_1130/for_training/train/train_list.lst'
+  TEST_SET: '/media/asura/T7_Shield_1/for_mid/20221130/total_1130/for_training/test/test_list.lst'
   NUM_CLASSES: 29
+  RESIZE_SHAPE: [1280, 1920]
 MODEL:
   NAME: seg_hrnet_ocr
   NUM_OUTPUTS: 2
@@ -110,4 +107,4 @@ TEST:
   FLIP_TEST: false
   MULTI_SCALE: false
   NUM_SAMPLES: None
-  MODEL_FILE: "./hrnet_output/custom/hrnet_custom_train/epoch_205.pth"
+  MODEL_FILE: "./hrnet_output/custom/hrnet_custom_train/epoch_285.pth"

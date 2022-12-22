@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import cv2
 import tqdm
-from utils.preprocessing import preprocessing
+from core_utils.preprocessing import preprocessing
 
 
 if __name__ == '__main__':

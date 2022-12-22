@@ -1,11 +1,14 @@
 import os
+import sys
 from pickletools import uint8
 import cv2
 import torch
 import numpy as np
 
 import torch.utils.data as data
- 
+
+from core_utils.preprocessing import *
+from core_utils.detectron2_dataloader import *
 
 class RGBXDataset(data.Dataset):
     def __init__(self, setting, split_name, preprocess=None, file_length=None):
@@ -22,9 +25,29 @@ class RGBXDataset(data.Dataset):
         self._train_source = setting['train_source']
         self._eval_source = setting['eval_source']
         self.class_names = setting['class_names']
+        self.resize_shape = setting['resize_shape']
         self._file_names = self._get_file_names(split_name)
         self._file_length = file_length
         self.preprocess = preprocess
+        
+        self.for_projection = preprocessing(
+            image_path='',
+            image_size=[4032, 3040],
+            lidar_path='',
+            label_path='',
+            list_filename=None,
+            separate_by_time=False,
+            config_filename=None,
+            undistortion=False,
+            hp_map_file_path=None,
+            hd_map_offset=[302209., 4124130.],
+            ignore_link_ids=None,
+            lidar_frame_id='custom',
+            lidar_publish_name='/custom_points',
+            time_interval=0.1,
+            index_interval=1,
+            using_ros=False
+        )
 
     def __len__(self):
         if self._file_length is not None:
@@ -43,15 +66,32 @@ class RGBXDataset(data.Dataset):
         # Check the following settings if necessary
         rgb = self._open_image(rgb_path, cv2.COLOR_BGR2RGB)
 
-        gt = self._open_image(gt_path, cv2.IMREAD_GRAYSCALE, dtype=np.uint8)
+        # Read pcd, projected this to RGB image
+        x = self.for_projection.make_projected_image(
+            rgb, 
+            x_path
+        )
+
+        if self.resize_shape.any():
+            rgb = cv2.resize(
+                rgb,
+                (self.resize_shape[1], self.resize_shape[0])
+            )
+            x = cv2.resize(
+                x,
+                (self.resize_shape[1], self.resize_shape[0])
+            )
+
+        # gt = self._open_image(gt_path, cv2.IMREAD_GRAYSCALE, dtype=np.uint8)
+        gt = make_one_gray_mask(gt_path, self.resize_shape)
         if self._transform_gt:
             gt = self._gt_transform(gt) 
 
-        if self._x_single_channel:
-            x = self._open_image(x_path, cv2.IMREAD_GRAYSCALE)
-            x = cv2.merge([x, x, x])
-        else:
-            x =  self._open_image(x_path, cv2.COLOR_BGR2RGB)
+        # if self._x_single_channel:
+        #     x = self._open_image(x_path, cv2.IMREAD_GRAYSCALE)
+        #     x = cv2.merge([x, x, x])
+        # else:
+        #     x =  self._open_image(x_path, cv2.COLOR_BGR2RGB)
         
         if self.preprocess is not None:
             rgb, gt, x = self.preprocess(rgb, gt, x)

@@ -33,6 +33,10 @@ C.x_is_single_channel = False # True for raw depth, thermal and aolp/dolp(not ao
 C.train_source = osp.join(C.dataset_path, "train.txt")
 C.eval_source = osp.join(C.dataset_path, "val.txt")
 C.is_test = False
+
+# Need to resize
+C.resize_shape = np.array([1280, 1920])
+
 C.num_train_imgs = 1545
 C.num_eval_imgs = 660
 C.num_classes = 29
