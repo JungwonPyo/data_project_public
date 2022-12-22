@@ -1,0 +1,116 @@
+CUDNN:
+  BENCHMARK: true
+  DETERMINISTIC: false
+  ENABLED: true
+# GPUS: (0,1,2,3)
+GPUS: (0,)
+OUTPUT_DIR: 'hrnet_output'
+LOG_DIR: 'hrnet_log'
+WORKERS: 8
+PRINT_FREQ: 10
+
+DATASET:
+  DATASET: custom
+  # DATASET: cityscapes
+  ROOT: ''
+  # TRAIN_SET: '/media/kkk/T7_Shield/for_mid/20221116/total_1116/for_training/train/train_list.lst'
+  # TEST_SET: '/media/kkk/T7_Shield/for_mid/20221116/total_1116/for_training/val/val_list.lst'
+  TRAIN_SET: '/media/kkk/T7_Shield1/for_mid/20221130/total_1130/for_training/train/train_list.lst'
+  TEST_SET: '/media/kkk/T7_Shield1/for_mid/20221130/total_1130/for_training/val/val_list.lst'
+  NUM_CLASSES: 29
+MODEL:
+  NAME: seg_hrnet_ocr
+  NUM_OUTPUTS: 2
+  # PRETRAINED: "checkpoints/hrnet_cs_8090_torch11.pth"
+  PRETRAINED: ''
+  EXTRA:
+    FINAL_CONV_KERNEL: 1
+    STAGE1:
+      NUM_MODULES: 1
+      NUM_RANCHES: 1
+      BLOCK: BOTTLENECK
+      NUM_BLOCKS:
+      - 4
+      NUM_CHANNELS:
+      - 64
+      FUSE_METHOD: SUM
+    STAGE2:
+      NUM_MODULES: 1
+      NUM_BRANCHES: 2
+      BLOCK: BASIC
+      NUM_BLOCKS:
+      - 4
+      - 4
+      NUM_CHANNELS:
+      - 48
+      - 96
+      FUSE_METHOD: SUM
+    STAGE3:
+      NUM_MODULES: 4
+      NUM_BRANCHES: 3
+      BLOCK: BASIC
+      NUM_BLOCKS:
+      - 4
+      - 4
+      - 4
+      NUM_CHANNELS:
+      - 48
+      - 96
+      - 192
+      FUSE_METHOD: SUM
+    STAGE4:
+      NUM_MODULES: 3
+      NUM_BRANCHES: 4
+      BLOCK: BASIC
+      NUM_BLOCKS:
+      - 4
+      - 4
+      - 4
+      - 4
+      NUM_CHANNELS:
+      - 48
+      - 96
+      - 192
+      - 384
+      FUSE_METHOD: SUM
+LOSS:
+  USE_OHEM: false
+  OHEMTHRES: 0.9
+  OHEMKEEP: 131072
+  BALANCE_WEIGHTS: [0.4, 1]
+TRAIN:
+  IMAGE_SIZE:
+  - 1024
+  - 512
+  BASE_SIZE: 2048
+  BATCH_SIZE_PER_GPU: 2
+  SHUFFLE: true
+  BEGIN_EPOCH: 0
+  END_EPOCH: 484
+  RESUME: true
+  OPTIMIZER: sgd
+  LR: 0.01
+  WD: 0.0005
+  MOMENTUM: 0.9
+  NESTEROV: false
+  FLIP: true
+  MULTI_SCALE: true
+  DOWNSAMPLERATE: 1
+  IGNORE_LABEL: 255
+  SCALE_FACTOR: 16
+  VALIDATION_TERM: 50
+  SAVE_MODEL_TERM: 5
+TEST:
+  # IMAGE_SIZE:
+  # - 2048
+  # - 1024
+  # BASE_SIZE: 2048
+  IMAGE_SIZE:
+  - 2048
+  - 1024
+  BASE_SIZE: 2048
+  BATCH_SIZE_PER_GPU: 1
+  FLIP_TEST: false
+  MULTI_SCALE: false
+  NUM_SAMPLES: 300
+  MODEL_FILE: "checkpoints/hrnet_cs_8090_torch11.pth"

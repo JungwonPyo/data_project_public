@@ -1,0 +1,29 @@
+Undefined Stuff
+Wall
+Driving Area
+Non Driving Area
+Parking Area
+No Parking Area
+Big Notice
+Pillar
+Parking Area Number
+Parking Line
+Disabled Icon
+Women Icon
+Compact Car Icon
+Speed Bump
+Parking Block
+Billboard
+Toll Bar
+Sign
+No Parking Sign
+Traffic Cone
+Fire Extinguisher
+Undefined Object
+Two-wheeled Vehicle
+Vehicle
+Wheelchair
+Stroller
+Shopping Cart
+Animal
+Human
