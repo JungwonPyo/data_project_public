@@ -166,7 +166,7 @@ class preprocessing(object):
         if self.image_path != '':
             self.image_files = self.get_filenames_from_folder(self.image_path)
         if self.lidar_path != '':
-            self.lidar_path = self.get_filenames_from_folder(self.lidar_path)
+            self.lidar_files = self.get_filenames_from_folder(self.lidar_path)
         
         
         ## If ther is not list file, get all lists from 
@@ -529,6 +529,7 @@ class preprocessing(object):
         input_rgb,
         input_pcd_path
     ):
+        # print('read: ', input_pcd_path)
         input_pcd = self.read_pcd_file(input_pcd_path)
         each_pcd_t = copy.deepcopy(input_pcd).transform(
             self.camera_lidar_extrinsic)
@@ -687,7 +688,7 @@ class preprocessing(object):
             # cloud.header.stamp = rospy.Time.from_sec(time)
             cloud.header.stamp = time
             cloud.header.frame_id = self.lidar_frame_id
-            points_np = np.asarray(o3d_points.points)
+            points_np = np.asarray(o3d_points.points, dtype=np.float32)
             # points_np = np.stack(
             #     (points_np[:, 2], points_np[:, 1], points_np[:, 0]), axis=1)
             cloud = pc2.create_cloud_xyz32(

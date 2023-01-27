@@ -12,8 +12,8 @@ PRINT_FREQ: 10
 DATASET:
   DATASET: custom
   ROOT: ''
-  TRAIN_SET: '/media/asura/T7_Shield_1/for_mid/20221130/total_1130/for_training/train/train_list.lst'
-  TEST_SET: '/media/asura/T7_Shield_1/for_mid/20221130/total_1130/for_training/test/test_list.lst'
+  TRAIN_SET: '/media/asura/Dataset/dataset/parking_dataset/total_for_training/for_training/train/train_list.lst'
+  TEST_SET: '/media/asura/Dataset/dataset/parking_dataset/total_for_training/for_training/test/test_list.lst'
   NUM_CLASSES: 29
   RESIZE_SHAPE: [1280, 1920]
 MODEL:
@@ -107,4 +107,4 @@ TEST:
   FLIP_TEST: false
   MULTI_SCALE: false
   NUM_SAMPLES: None
-  MODEL_FILE: "./hrnet_output/custom/hrnet_custom_train/epoch_285.pth"
+  MODEL_FILE: "./hrnet_output/custom/hrnet_custom_train/best.pth"
