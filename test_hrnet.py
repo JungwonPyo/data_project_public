@@ -11,6 +11,8 @@ from pathlib import Path
 
 import numpy as np
 
+import scipy.io as sio
+
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
@@ -115,6 +117,9 @@ def print_iou(
     line = "\n".join(lines)
     if not no_print:
         print(line)
+
+    logging.info(line)
+
     return line
 
 def main():
@@ -123,8 +128,8 @@ def main():
     logger, final_output_dir, _ = create_logger(
         config, args.cfg, 'test')
 
-    logger.info(pprint.pformat(args))
-    logger.info(pprint.pformat(config))
+    logging.info(pprint.pformat(args))
+    logging.info(pprint.pformat(config))
 
     # cudnn related setting
     cudnn.benchmark = config.CUDNN.BENCHMARK
@@ -218,7 +223,7 @@ def main():
             )
     
         msg = 'MeanIU: {: 4.4f}, Pixel_Acc: {: 4.4f}, \
-            Mean_Acc: {: 4.4f}, Class IoU: '.format(mean_IoU, 
+            Mean_Acc: {: 4.4f}'.format(mean_IoU, 
             pixel_acc, mean_acc)
         logging.info(msg)
         logging.info(IoU_array)
@@ -231,13 +236,23 @@ def main():
             show_no_back=False, 
             no_print=False
             )
+        sio.savemat(
+            './hrnet_results/results.mat',
+            {
+                'mean_IoU': mean_IoU,
+                'IoU_array': IoU_array,
+                'pixel_acc': pixel_acc,
+                'mean_acc': mean_acc,
+            }
+        )
 
     end = timeit.default_timer()
-    logger.info('Mins: %d' % np.int((end-start)/60))
+    logger.info('Mins: %d' % np.int64((end-start)/60))
     logger.info('Done')
 
 
 if __name__ == '__main__':
     main()
 
+# python test_hrnet.py --cfg ./configs/hrnet_custom_train.yaml
 # python test_hrnet.py --cfg ./configs/hrnet_custom_test.yaml

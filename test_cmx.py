@@ -1,13 +1,17 @@
 import os
 import sys
 import cv2
+import pprint
 import argparse
 import numpy as np
+import logging
 
 import torch
 import torch.nn as nn
 
 from PIL import Image
+
+import scipy.io as sio
 
 from configs.cmx_config_custom import config
 
@@ -138,6 +142,16 @@ class SegEvaluator(Evaluator):
         iou, mean_IoU, _, freq_IoU, mean_pixel_acc, pixel_acc = compute_score(hist, correct, labeled)
         result_line = print_iou(iou, freq_IoU, mean_pixel_acc, pixel_acc,
                                 dataset.class_names, show_no_back=False)
+        sio.savemat(
+            '%s/results.mat' % (self.save_path),
+            {
+                'mean_IoU': mean_IoU,
+                'iou': iou,
+                'freq_IoU': freq_IoU,
+                'mean_pixel_acc': mean_pixel_acc,
+                'pixel_acc': pixel_acc,
+            }
+        )
         return result_line
 
 if __name__ == "__main__":
@@ -151,8 +165,20 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     all_dev = parse_devices(args.devices)
+    
+    logging.info(pprint.pformat(args))
+    
+    logging.info('=> Start defining model...')
+    
+    logging.info('=> Loading trained model from {}'.format(
+        config.pretrained_model))
 
     network = segmodel(cfg=config, criterion=None, norm_layer=nn.BatchNorm2d)
+    
+    logging.info('=> End defining model')
+    
+    logging.info('=> Loading dataset from {}'.format(config.test_source))
+    
     data_setting = {'rgb_root': config.rgb_root_folder,
                     'rgb_format': config.rgb_format,
                     'gt_root': config.gt_root_folder,
@@ -170,13 +196,26 @@ if __name__ == "__main__":
     val_pre = ValPre()
     dataset = RGBXDataset(data_setting, 'val', val_pre)
  
+    logging.info('=> Loading dataset done')
+ 
     with torch.no_grad():
+        
         segmentor = SegEvaluator(dataset, config.num_classes, config.norm_mean,
                                  config.norm_std, network,
                                  config.eval_scale_array, config.eval_flip,
                                  all_dev, args.verbose, args.save_path,
                                  args.show_image)
+        
+        logging.info('=> Start evaluation...')
+        
         segmentor.run(config.checkpoint_dir, args.epochs, config.val_log_file,
                       config.link_val_log_file)
+        
+        logging.info('=> End evaluation')
+        
+        logging.info('=> Logs saved to {}'.format(segmentor.save_path))
+        
+        logging.info('=> Images saved to {}, if save path defined'.format(
+            segmentor.save_path+'_color'))
 
 # python test_cmx.py -p ./cmx_log/result_images
