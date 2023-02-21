@@ -468,7 +468,8 @@ class HighResolutionNet(nn.Module):
         self.stage4, pre_stage_channels = self._make_stage(
             self.stage4_cfg, num_channels, multi_scale_output=True)
 
-        last_inp_channels = np.int(np.sum(pre_stage_channels))
+        # last_inp_channels = np.int(np.sum(pre_stage_channels))
+        last_inp_channels = np.int32(np.sum(pre_stage_channels))
         ocr_mid_channels = config.MODEL.OCR.MID_CHANNELS
         ocr_key_channels = config.MODEL.OCR.KEY_CHANNELS
 
@@ -663,10 +664,15 @@ class HighResolutionNet(nn.Module):
             logger.info('=> loading pretrained model {}'.format(pretrained))
             model_dict = self.state_dict()
             pretrained_dict = {k.replace('last_layer', 'aux_head').replace('model.', ''): v for k, v in pretrained_dict.items()}  
+            # print(model_dict.keys())
+            print('defined - pretrained')
             print(set(model_dict) - set(pretrained_dict))            
+            print('pretrained - defined')
             print(set(pretrained_dict) - set(model_dict))            
             pretrained_dict = {k: v for k, v in pretrained_dict.items()
                                if k in model_dict.keys()}
+            pretrained_dict = self.check_dict(model_dict, pretrained_dict)
+            # print(pretrained_dict.keys())
             # for k, _ in pretrained_dict.items():
                 # logger.info(
                 #     '=> loading {} pretrained model {}'.format(k, pretrained))
@@ -675,6 +681,27 @@ class HighResolutionNet(nn.Module):
         elif pretrained:
             raise RuntimeError('No such file {}'.format(pretrained))
 
+
+    def check_dict(self, model_dict, pretrained_dict):
+
+        target_keys = []
+
+        for k, v in pretrained_dict.items():
+
+            if k in model_dict.keys():
+                if v.size() == model_dict[k].size():
+                    ...
+                else:
+                    print(v.size())
+                    print(model_dict[k].size())
+                    print(k, ' is not matched !!')
+                    target_keys.append(k)
+                    
+        for each in target_keys:
+            pretrained_dict.pop(each)
+            print(each, ' is removed from pretrained_dict !!')
+
+        return pretrained_dict
 
 def get_seg_model(cfg, **kwargs):
     model = HighResolutionNet(cfg, **kwargs)

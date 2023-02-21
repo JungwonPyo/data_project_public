@@ -15,7 +15,7 @@ DATASET:
   TRAIN_SET: '/media/cjh/T7_Shield_1/total_for_training/for_training/train/train_list.lst'
   TEST_SET: '/media/cjh/T7_Shield_1/total_for_training/for_training/val/val_list.lst'
   NUM_CLASSES: 29
-  RESIZE_SHAPE: [1280, 1920]
+  RESIZE_SHAPE: [1024, 2048]
 MODEL:
   NAME: seg_hrnet_ocr
   NUM_OUTPUTS: 2

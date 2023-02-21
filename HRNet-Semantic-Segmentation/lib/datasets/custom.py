@@ -6,6 +6,8 @@
 
 import os
 
+import random
+
 import cv2
 import numpy as np
 from PIL import Image
@@ -22,6 +24,7 @@ class Custom(BaseDataset):
                  root, 
                  list_path, 
                  num_samples=None, 
+                 random_samples=None,
                  num_classes=19,
                  multi_scale=True, 
                  flip=True, 
@@ -51,6 +54,8 @@ class Custom(BaseDataset):
         self.files = self.read_files()
         if num_samples:
             self.files = self.files[:num_samples]
+        if random_samples:
+            self.files = random.choices(self.files, k=random_samples)
 
         # self.label_mapping = {-1: ignore_label, 0: ignore_label, 
         #                       1: ignore_label, 2: ignore_label, 
@@ -141,6 +146,14 @@ class Custom(BaseDataset):
             1., 1., 1., 1., 1., # 19, 20, 21, 22, 23
             1., 1., 1., 1. # 24, 25, 26, 27
             ]).cuda()
+        # self.class_weights = torch.FloatTensor([
+        #     0.83, 0.9, 1., 1., 1.1, # -1, 0, 1, 2, 3
+        #     1.1, 1., 1., 1.1, 1.2, # 4, 5, 6, 7, 8
+        #     1.2, 1.2, 1.1, 1.1, 1.2, # 9, 10, 11, 12, 13
+        #     1.2, 1., 1.2, 1.1, 1.2, # 14, 15, 16, 17, 18
+        #     1.2, 1.1, 0.9, 1.1, 1.2, # 19, 20, 21, 22, 23
+        #     1.2, 1.2, 1.1, 0.81 # 24, 25, 26, 27
+        #     ]).cuda()
     
     def read_files(self):
         files = []
@@ -182,7 +195,7 @@ class Custom(BaseDataset):
         item = self.files[index]
         name = item["name"]
         # image = cv2.imread(os.path.join(self.root,'cityscapes',item["img"]),
-        #                    cv2.IMREAD_COLOR)
+        #                    cv2.IMREAD_COLOR) 
         image = cv2.imread(os.path.join(self.root, item["img"]),
                            cv2.IMREAD_COLOR)
         
@@ -229,8 +242,8 @@ class Custom(BaseDataset):
         batch, _, ori_height, ori_width = image.size()
         assert batch == 1, "only supporting batchsize 1."
         image = image.numpy()[0].transpose((1,2,0)).copy()
-        stride_h = np.int(self.crop_size[0] * 1.0)
-        stride_w = np.int(self.crop_size[1] * 1.0)
+        stride_h = np.int64(self.crop_size[0] * 1.0)
+        stride_w = np.int64(self.crop_size[1] * 1.0)
         final_pred = torch.zeros([1, self.num_classes,
                                     ori_height,ori_width]).cuda()
         for scale in scales:
@@ -247,9 +260,9 @@ class Custom(BaseDataset):
                 preds = preds[:, :, 0:height, 0:width]
             else:
                 new_h, new_w = new_img.shape[:-1]
-                rows = np.int(np.ceil(1.0 * (new_h - 
+                rows = np.int64(np.ceil(1.0 * (new_h - 
                                 self.crop_size[0]) / stride_h)) + 1
-                cols = np.int(np.ceil(1.0 * (new_w - 
+                cols = np.int64(np.ceil(1.0 * (new_w - 
                                 self.crop_size[1]) / stride_w)) + 1
                 preds = torch.zeros([1, self.num_classes,
                                            new_h,new_w]).cuda()

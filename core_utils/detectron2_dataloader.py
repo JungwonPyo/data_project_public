@@ -20,6 +20,38 @@ from multiprocessing import Pool
 from multiprocessing import Process
 import parmap
 
+# class_info = {
+#     'Wall':                 [134, 187, 113],
+#     'Driving Area':         [161, 1, 222],
+#     'Non Driving Area':     [136, 189, 197],
+#     'Parking Area':         [121, 242, 64],
+#     'No Parking Area':      [2, 233, 117],
+#     'Big Notice':           [31, 230, 229],
+#     'Pillar':               [12, 118, 24],
+#     'Parking Area Number':  [78, 152, 159],
+#     'Parking Line':         [153, 69, 64],
+#     'Disabled Icon':        [3, 116, 111],
+#     'Women Icon':           [108, 76, 171],
+#     'Compact Car Icon':     [134, 19, 237],
+#     'Speed Bump':           [176, 179, 119],
+#     'Parking Block':        [142, 88, 239],
+#     'Billboard':            [192, 112, 43],
+#     'Toll Bar':             [65, 103, 134],
+#     'Sign':                 [174, 9, 13],
+#     'No Parking Sign':      [124, 254, 106],
+#     'Traffic Cone':         [163, 70, 156],
+#     'Fire Extinguisher':    [28, 75, 236],
+#     'Undefined Object':     [188, 104, 114],
+#     'Two-wheeled Vehicle':  [186, 49, 30],
+#     'Vehicle':              [82, 60, 101],
+#     'Wheelchair':           [154, 231, 118],
+#     'Stroller':             [78, 15, 210],
+#     'Shopping Cart':        [95, 25, 104],
+#     'Animal':               [125, 11, 145],
+#     # 'Human':                [88, 28, 38],
+#     'Human':                [112, 133, 153],
+#     'Undefined Stuff':      [202, 197, 79],
+# }
 class_info = {
     'Wall':                 [134, 187, 113],
     'Driving Area':         [161, 1, 222],
@@ -48,7 +80,7 @@ class_info = {
     'Stroller':             [78, 15, 210],
     'Shopping Cart':        [95, 25, 104],
     'Animal':               [125, 11, 145],
-    'Human':                [88, 28, 38],
+    'Human':                [112, 133, 153],
     'Undefined Stuff':      [202, 197, 79],
 }
 

@@ -59,6 +59,7 @@ _C.DATASET.ROOT = ''
 _C.DATASET.DATASET = 'cityscapes'
 _C.DATASET.NUM_CLASSES = 19
 _C.DATASET.RESIZE_SHAPE = [1280, 1920]
+_C.DATASET.RANDOM_SAMPLES = None
 _C.DATASET.TRAIN_SET = 'list/cityscapes/train.lst'
 _C.DATASET.EXTRA_TRAIN_SET = ''
 _C.DATASET.TEST_SET = 'list/cityscapes/val.lst'
