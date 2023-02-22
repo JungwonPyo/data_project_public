@@ -73,6 +73,8 @@ class Evaluator(object):
             model_slice = np.array(sorted_models)[bound]
             models = [os.path.join(model_path, model) for model in
                       model_slice]
+        elif 'custom' in model_indice:
+            models = [model_path]
         else:
             if os.path.exists(model_path):
                 models = [os.path.join(model_path, 'epoch-%s.pth' % model_indice), ]
