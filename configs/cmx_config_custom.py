@@ -19,7 +19,7 @@ C.abs_dir = osp.realpath(".")
 # Dataset config
 """Dataset Path"""
 C.dataset_name = 'custom'
-C.dataset_path = '/media/kkk/T7_Shield'
+C.dataset_path = '/media/kkk/T7_Shield_2'
 # C.rgb_root_folder = osp.join(C.dataset_path, 'img')
 C.rgb_root_folder = osp.join(C.dataset_path, 'de_front')
 C.rgb_format = '.jpg'
@@ -48,7 +48,7 @@ C.is_test = False
 # C.num_train_imgs = 1545
 # C.num_eval_imgs = 660
 C.num_train_imgs = 40823
-C.num_eval_imgs = 4082
+C.num_eval_imgs = 2
 C.num_classes = 29
 C.class_names = [
     'Wall',
@@ -94,7 +94,8 @@ C.log_dir = osp.abspath('cmx_log')
 C.backbone = 'mit_b5' # Remember change the path below.
 # C.pretrained_model = C.root_dir + '/checkpoints/segformers/mit_b2.pth'
 # C.pretrained_model = C.root_dir + '/checkpoints/segformers/mit_b5.pth'
-C.pretrained_model = C.log_dir + '/checkpoint/epoch-last.pth'
+# C.pretrained_model = C.log_dir + '/checkpoint/epoch-last.pth'
+C.pretrained_model = '/home/kkk/data_project/cmx_log/submit/cmx_submit_checkpoint.pth'
 C.decoder = 'MLPDecoder'
 C.decoder_embed_dim = 512
 C.optimizer = 'AdamW'

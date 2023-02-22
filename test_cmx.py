@@ -156,7 +156,7 @@ class SegEvaluator(Evaluator):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-e', '--epochs', default='last', type=str)
+    parser.add_argument('-e', '--epochs', default='custom', type=str)
     parser.add_argument('-d', '--devices', default='0', type=str)
     parser.add_argument('-v', '--verbose', default=False, action='store_true')
     parser.add_argument('--show_image', '-s', default=False,
@@ -208,7 +208,9 @@ if __name__ == "__main__":
         
         logging.info('=> Start evaluation...')
         
-        segmentor.run(config.checkpoint_dir, args.epochs, config.val_log_file,
+        # segmentor.run(config.checkpoint_dir, args.epochs, config.val_log_file,
+        #               config.link_val_log_file)
+        segmentor.run(config.pretrained_model, args.epochs, config.val_log_file,
                       config.link_val_log_file)
         
         logging.info('=> End evaluation')
