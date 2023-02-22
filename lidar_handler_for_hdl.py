@@ -23,7 +23,7 @@ if __name__ == '__main__':
             base_path, temp_place)
         list_filename = '%s/%s/csv/%s.csv' % (
             base_path, temp_place, temp_place)
-        save_mat_name = '%s' % (
+        save_mat_name = '%s_hdl.mat' % (
             temp_place)
     else:
         image_path = '%s/%s/%s/camera' % (
