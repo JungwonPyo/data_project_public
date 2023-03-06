@@ -54,6 +54,7 @@ class OhemCrossEntropy(nn.Module):
             ignore_index=ignore_label,
             reduction='none'
         )
+        print('train_dataset.class_weights: ', weight)
 
     def _ce_forward(self, score, target):
         ph, pw = score.size(2), score.size(3)
@@ -62,6 +63,7 @@ class OhemCrossEntropy(nn.Module):
             score = F.interpolate(input=score, size=(
                 h, w), mode='bilinear', align_corners=config.MODEL.ALIGN_CORNERS)
 
+        # print(score.size(), target.size())
         loss = self.criterion(score, target)
 
         return loss

@@ -23,12 +23,6 @@ import torch.backends.cudnn as cudnn
 import torch.optim
 from tensorboardX import SummaryWriter
 
-
-# sys.path.append('../..')
-# from utils.detectron2_dataloader import *
-# from projects.DeepLab.deeplab import add_deeplab_config, build_lr_scheduler
-# sys.path.remove('../..')
-
 def add_path(path):
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -37,11 +31,8 @@ def add_path(path):
 hrnet_repo_path = './HRNet-Semantic-Segmentation'
 
 sys.path.append(hrnet_repo_path)
-# this_dir = os.path.dirname(hrnet_repo_path)
 lib_path = os.path.join(hrnet_repo_path, 'lib')
-# add_path(lib_path)
 sys.path.append(lib_path)
-# print(sys.path)
 import models
 import datasets
 from config import config
@@ -73,7 +64,7 @@ def parse_args():
 
 
 def get_sampler(dataset):
-    from core_utils.distributed import is_distributed
+    from utils.distributed import is_distributed
     if is_distributed():
         from torch.utils.data.distributed import DistributedSampler
         return DistributedSampler(dataset)
@@ -143,8 +134,10 @@ def main():
         root=config.DATASET.ROOT,
         list_path=config.DATASET.TRAIN_SET,
         num_samples=None,
+        random_samples=config.DATASET.RANDOM_SAMPLES,
         num_classes=config.DATASET.NUM_CLASSES,
         resize_shape=config.DATASET.RESIZE_SHAPE,
+        use_json=config.DATASET.USE_JSON,
         multi_scale=config.TRAIN.MULTI_SCALE,
         flip=config.TRAIN.FLIP,
         ignore_label=config.TRAIN.IGNORE_LABEL,
@@ -171,6 +164,7 @@ def main():
             num_samples=None,
             num_classes=config.DATASET.NUM_CLASSES,
             resize_shape=config.DATASET.RESIZE_SHAPE,
+            use_json=config.DATASET.USE_JSON,
             multi_scale=config.TRAIN.MULTI_SCALE,
             flip=config.TRAIN.FLIP,
             ignore_label=config.TRAIN.IGNORE_LABEL,
@@ -197,6 +191,7 @@ def main():
         num_samples=config.TEST.NUM_SAMPLES,
         num_classes=config.DATASET.NUM_CLASSES,
         resize_shape=config.DATASET.RESIZE_SHAPE,
+        use_json=config.DATASET.USE_JSON,
         multi_scale=False,
         flip=False,
         ignore_label=config.TRAIN.IGNORE_LABEL,
@@ -257,12 +252,13 @@ def main():
             params = [
                 {'params': list(params_dict.values()), 'lr': config.TRAIN.LR}]
 
-        optimizer = torch.optim.SGD(params,
-                                    lr=config.TRAIN.LR,
-                                    momentum=config.TRAIN.MOMENTUM,
-                                    weight_decay=config.TRAIN.WD,
-                                    nesterov=config.TRAIN.NESTEROV,
-                                    )
+        optimizer = torch.optim.SGD(
+            params,
+            lr=config.TRAIN.LR,
+            momentum=config.TRAIN.MOMENTUM,
+            weight_decay=config.TRAIN.WD,
+            nesterov=config.TRAIN.NESTEROV,
+            )
     else:
         raise ValueError('Only Support SGD optimizer')
 
@@ -315,13 +311,13 @@ def main():
                   epoch_iters, config.TRAIN.LR, num_iters,
                   trainloader, optimizer, model, writer_dict)
 
-        if epoch % config.TRAIN.VALIDATION_TERM == 0 and epoch != 0:
-            valid_loss, mean_IoU, IoU_array = validate(
-                config,
-                testloader, 
-                model, 
-                writer_dict
-                )
+        # if epoch % config.TRAIN.VALIDATION_TERM == 0 and epoch != 0:
+        #     valid_loss, mean_IoU, IoU_array = validate(
+        #         config,
+        #         testloader, 
+        #         model, 
+        #         writer_dict
+        #         )
 
         if args.local_rank <= 0 and epoch % config.TRAIN.SAVE_MODEL_TERM == 0:
             logger.info('=> saving checkpoint to {}'.format(

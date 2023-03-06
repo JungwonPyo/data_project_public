@@ -184,26 +184,7 @@ class preprocessing(object):
 
         # Set custom matrix if there is no config file
         if self.config_filename is None:
-            # self.camera_intrinsic = np.array([
-            #     [1478.453504, 0.000000, 975.691216],
-            #     [0.000000, 1472.703315, 376.876506],
-            #     [0.000000, 0.000000, 1.000000]
-            # ])
-            # self.camera_distortion = np.array([
-            #     0.081891, -0.179290, 0.001540, -0.001314, 0.000000
-            # ])
-            # self.camera_lidar_extrinsic = np.array([
-            #     [0.01359768, -0.99975766, -0.01731238, -0.03784309],
-            #     [0.08916464, 0.01845737, -0.99584587, -0.11696305],
-            #     [0.99592408, 0.01199754, 0.08939401, -0.03077733],
-            #     [0., 0., 0., 1.],
-            # ])
-            # self.projection_matrix = np.array([
-            #     [1482.718506, 0.000000, 974.054154, 0.000000],
-            #     [0.000000, 1488.223145, 377.875855, 0.000000],
-            #     [0.000000, 0.000000, 1.000000, 0.000000],
-            #     [0., 0., 0., 1.],
-            # ])
+
             '''
                 GeoN sensor parameters:
                 >> tform.Translation
@@ -248,28 +229,7 @@ class preprocessing(object):
                 -0.0206   -0.0279    0.9994
                 -0.0033   -0.9996   -0.0280
             '''
-            # self.camera_intrinsic = np.array([
-            #     [1.000000, 0.000000, 0.000000],
-            #     [0.000000, 1.000000, 0.000000],
-            #     [0.000000, 0.000000, 1.000000]
-            # ])
-            # self.camera_distortion = np.array([
-            #     0.0, 0.0, 0.0, 0.0, 0.0
-            # ])
-            # self.camera_intrinsic = np.array([
-            #     [2007.6, 0.000000, 2079.9],
-            #     [0.000000, 1994.1, 1503.8],
-            #     [0.000000, 0.000000, 1.000000]
-            # ])
-            # self.camera_distortion = np.array([
-            #     -0.0392, -0.0266, 0.0, 0.0, 0.0
-            # ])
-            # self.camera_lidar_extrinsic = np.array([
-            #     [0.8310, -0.3372, -0.4424, 0.0],
-            #     [-0.2645, 0.4601, -0.8475, 0.0],
-            #     [0.4894, 0.8213, 0.2931, 0.0],
-            #     [0.5091, -0.2063, 2.8101, 1.0000],
-            # ]).transpose()
+
             self.camera_intrinsic = np.array([
                 [2124.899035, 0.000000, 2016.000000],
                 [0.000000, 2124.899035, 1520.000000],
@@ -290,12 +250,6 @@ class preprocessing(object):
                 -0.00493334225037506	-0.999967934929661	0.00630803033838834	0
                 0.00208433790457183	0.190056099985926	0.00986245921618803	1
             '''
-            # self.camera_lidar_extrinsic = np.array([
-            #     [0.999961802241891, -0.00488760215544343, 0.00724606115896803, 0.0000],
-            #     [-0.00721499767082878, 0.00634353668543567, 0.999953850610582, 0.0000],
-            #     [-0.00493334225037506, -0.999967934929661, 0.00630803033838834, 0.0000],
-            #     [0.00208433790457183, 0.190056099985926, 0.00986245921618803, 1.0000],
-            # ]).transpose()
             temp_eye = np.eye(4, dtype=np.float)
             temp_intrinsic = np.array([
                 [2007.6, 0.000000, 2079.9],
@@ -305,18 +259,12 @@ class preprocessing(object):
             
             temp_eye[:3, :3] = temp_intrinsic
             self.projection_matrix = temp_eye
-            # self.projection_matrix = np.matmul(
-            #     temp_eye,
-            #     self.camera_lidar_extrinsic)
-            
+
         else:
             ...
             
         self.camera_info_class = PinholeCameraModel()
-        
-        # self.K_mul_R = np.matmul(temp_eye,
-        #                          self.camera_lidar_extrinsic)
-            
+          
         self.camera_info_class.fromCameraInfo(
             K=self.camera_intrinsic,
             D=self.camera_distortion,
@@ -395,10 +343,6 @@ class preprocessing(object):
             img = cv2.remap(img, self.mapx,self.mapy, cv2.INTER_LINEAR)
         
         points3D = np.asarray(lidar.points)
-        # print(np.min(points3D[:, 0]), np.max(points3D[:, 0]))
-        # print(np.min(points3D[:, 1]), np.max(points3D[:, 1]))
-        # print(np.min(points3D[:, 2]), np.max(points3D[:, 2]))
-        # print(points3D)
 
         max_range = 20
 
@@ -407,38 +351,17 @@ class preprocessing(object):
                            (points3D[:, 2] < max_range) &
                            (np.abs(points3D[:, 0]) < max_range) &
                            (np.abs(points3D[:, 1]) < max_range))
-        # inrange = np.where((np.abs(points3D[:, 0]) < 6) &
-        #                    (np.abs(points3D[:, 1]) < 6))
-        # max_intensity = np.max(points3D[:, -1]) * 1e3
-        max_intensity = max_range * 1e3
-        # max_intensity = min(np.max(points3D[:, -1]), max_range)
-        points3D = points3D[inrange[0]]
-        # print(np.min(points3D[:, 0]), np.max(points3D[:, 0]))
-        # print(np.min(points3D[:, 1]), np.max(points3D[:, 1]))
-        # print(np.min(points3D[:, 2]), np.max(points3D[:, 2]))
-        # print(points3D)
-        
-        # Color map for the points
-        # cmap = matplotlib.cm.get_cmap('jet')
-        # colors = cmap((points3D[:, -1] * 1e3) / max_intensity) * 255
-        # colors = np.squeeze(self.get_depth_colors(
-        #     int(max_intensity // 10) + 1
-        #     ), axis=0)
 
-        # Project to 2D and filter points within image boundaries
-        # points2D = [self.camera_info_class.project3dToPixel(
-        #     point) for point in points3D[:, :3]]
-        # points2D = np.asarray(points2D)
-        # points2D = self.camera_info_class.project3dToPixel_Total(points3D)
+        max_intensity = max_range * 1e3
+        points3D = points3D[inrange[0]]
+        
         points2D = self.camera_info_class.project3dToPixel_based_on_intrinsic(
             points3D)
-        # print(np.shape(points2D))
         inrange = np.where((points2D[:, 0] >= 0) &
                            (points2D[:, 1] >= 0) &
                            (points2D[:, 0] < np.shape(img)[1]) &
                            (points2D[:, 1] < np.shape(img)[0]))
         points2D = points2D[inrange[0]]
-        # print(np.shape(points2D))
 
         cmap = matplotlib.cm.get_cmap('jet')
         colors = cmap((points2D[:, -1] * 1e3) / max_intensity) * 255
@@ -446,22 +369,9 @@ class preprocessing(object):
         # Draw the projected 2D points
         result = copy.deepcopy(img)
         for i in range(len(points2D)):
-            # print(tuple(points2D[i, :2]))
-            # print(tuple(colors[int(points2D[i, 2] * 1e3 // 10), :]))
             cv2.circle(result, tuple(points2D[i, :2].round().astype(
                 'int')), 10, tuple(colors[i, :]), -1)
-            # cv2.circle(result, tuple(points2D[i, :2].round().astype('int')), 5, tuple(
-                # colors[int(points2D[i, 2] * 1e3 // 10), :].tolist()), -1)
-
-        # if self.using_ros:
-        #     # Publish the projected points image
-        #     try:
-        #         self.image_pub.publish(self.bridge.cv2_to_imgmsg(img, "bgr8"))
-        #     except CvBridgeError as e:
-        #         rospy.logerr(e)
-        # else:
-        #     ...
-            
+         
         return img, result
     
     def project_point_cloud_with_clustering(
@@ -540,30 +450,12 @@ class preprocessing(object):
         return matched_img
     
     def read_each_from_lists(self, index):
-        # each_png_name = self.list_pd.loc[index]['png_name']
-        # each_pcd_name = self.list_pd.loc[index]['pcd_name']
-        # each_png_name = self.list_pd.loc[index]['image_path']
-        # each_pcd_name = self.list_pd.loc[index]['pcd_path']
         each_png_name = self.image_files[index]
-        # each_pcd_name = self.lidar_files[index]
-        # print(each_png_name)
-        # print(each_pcd_name)
         
-        # each_png = cv2.imread('%s/%s' % (self.image_path, each_png_name))
         each_png = o3d.io.read_image('%s/%s' % (self.image_path, each_png_name))
-        # each_pcd = self.read_pcd_file(
-        #     '%s/%s' % (self.lidar_path, each_pcd_name))
         each_pcd = self.read_pcd_file(
             '%s/%s.pcd' % (self.lidar_path, each_png_name[:-4]))
         each_pcd_t = copy.deepcopy(each_pcd).transform(self.camera_lidar_extrinsic)
-        
-        # o3d.visualization.draw_geometries([each_pcd],
-        #                                   zoom=0.3412,
-        #                                   front=[0.4257, -0.2125, -0.8795],
-        #                                   lookat=[2.6172, 2.0475, 1.532],
-        #                                   up=[-0.0694, -0.9768, 0.2024])
-        
-        # return self.project_point_cloud(each_pcd, cv2.resize(np.asarray(each_png), tuple(self.image_size)))
         
         img, matched_img = self.project_point_cloud(each_pcd_t, cv2.resize(np.asarray(each_png), tuple(self.image_size)))
         
@@ -571,28 +463,13 @@ class preprocessing(object):
         return img, matched_img, each_pcd
             
     def read_each(self, index):
-        # each_png_name = self.list_pd.loc[index]['png_name']
-        # each_pcd_name = self.list_pd.loc[index]['pcd_name']
-        # each_png_name = self.list_pd.loc[index]['image_path']
-        # each_pcd_name = self.list_pd.loc[index]['pcd_path']
         each_png_name = self.list_pd.loc[index]['CAMERA']
         each_pcd_name = self.list_pd.loc[index]['LIDAR']
-        # print(each_png_name)
-        # print(each_pcd_name)
-        
-        # each_png = cv2.imread('%s/%s' % (self.image_path, each_png_name))
+
         each_png = o3d.io.read_image('%s/%s' % (self.image_path, each_png_name))
         each_pcd = self.read_pcd_file(
             '%s/%s' % (self.lidar_path, each_pcd_name))
         each_pcd_t = copy.deepcopy(each_pcd).transform(self.camera_lidar_extrinsic)
-        
-        # o3d.visualization.draw_geometries([each_pcd],
-        #                                   zoom=0.3412,
-        #                                   front=[0.4257, -0.2125, -0.8795],
-        #                                   lookat=[2.6172, 2.0475, 1.532],
-        #                                   up=[-0.0694, -0.9768, 0.2024])
-        
-        # return self.project_point_cloud(each_pcd, cv2.resize(np.asarray(each_png), tuple(self.image_size)))
         
         img, matched_img = self.project_point_cloud(each_pcd_t, cv2.resize(np.asarray(each_png), tuple(self.image_size)))
         
@@ -655,16 +532,9 @@ class preprocessing(object):
         index, 
         clustering_class
         ):
-        # each_png_name = self.list_pd.loc[index]['png_name']
-        # each_pcd_name = self.list_pd.loc[index]['pcd_name']
-        # each_png_name = self.list_pd.loc[index]['image_path']
-        # each_pcd_name = self.list_pd.loc[index]['pcd_path']
         each_png_name = self.list_pd.loc[index]['CAMERA']
         each_pcd_name = self.list_pd.loc[index]['LIDAR']
-        # print(each_png_name)
-        # print(each_pcd_name)
 
-        # each_png = cv2.imread('%s/%s' % (self.image_path, each_png_name))
         each_png = o3d.io.read_image(
             '%s/%s' % (self.image_path, each_png_name))
         each_pcd = self.read_pcd_file(
@@ -677,8 +547,6 @@ class preprocessing(object):
             clustering_class
             )
 
-        # return img, matched_img, each_pcd_t
-        # return img, matched_img, matched_img_clustering, each_pcd_t
         return img, matched_img, matched_img_clustering, each_pcd
     
     def open3d2pointcloud(self, time, o3d_points):
@@ -689,8 +557,7 @@ class preprocessing(object):
             cloud.header.stamp = time
             cloud.header.frame_id = self.lidar_frame_id
             points_np = np.asarray(o3d_points.points, dtype=np.float32)
-            # points_np = np.stack(
-            #     (points_np[:, 2], points_np[:, 1], points_np[:, 0]), axis=1)
+
             cloud = pc2.create_cloud_xyz32(
                 cloud.header, points_np)
             
@@ -736,11 +603,7 @@ class preprocessing(object):
         
         while not rospy.is_shutdown():
             try:
-                # now = rospy.Time.now()
                 now = rospy.Time(0)
-                # self.listener.waitForTransform(
-                #     tf_from, tf_to, now, self.duration)
-                # t = self.listener.getLatestCommonTime(tf_from, tf_to)
                 position, quaternion = self.listener.lookupTransform(
                     tf_from, tf_to, now)
                 total_tf.append(
@@ -817,13 +680,6 @@ class preprocessing(object):
 
                 ## Save to mat
                 try:
-                    # save_time = cur_time - self.duration
-                    # now = rospy.Time(0)
-                    # now = rospy.get_rostime()
-                    # print('now: ', now)
-                    # save_time = cur_time - self.duration
-                    # self.listener.waitForTransform(
-                    #     tf_from, tf_to, cur_time - self.duration, rospy.Duration(0.0))
                     time_stamp = self.listener.getLatestCommonTime(
                         tf_from, tf_to)  # This does return the sim time
                     # print('tf time_stamp: ', time_stamp)
@@ -870,12 +726,6 @@ class preprocessing(object):
                 leave=False
                 ):
 
-                # print(cur_time)
-                # cur_ind = self.list_pd.index[
-                #     self.list_pd['EUCLIDEAN'] == self.lists_by_dist[i][j]]
-                # print(self.lists_by_dist[i][j])
-                # print(cur_ind)
-
                 _, _, points = self.read_each(total_num)
 
                 cloud_msg = self.open3d2pointcloud(cur_time, points)
@@ -887,21 +737,11 @@ class preprocessing(object):
                 self.clock_pub.publish(clock_msg)
                 self.lidar_pub.publish(cloud_msg)
 
-                # rospy.sleep(self.duration)
-                # self.rate.sleep()
-
                 total_num += self.index_interval
                 cur_time += self.duration
 
                 ## Save to mat
                 try:
-                    # save_time = cur_time - self.duration
-                    # now = rospy.Time(0)
-                    # now = rospy.get_rostime()
-                    # print('now: ', now)
-                    # save_time = cur_time - self.duration
-                    # self.listener.waitForTransform(
-                    #     tf_from, tf_to, cur_time - self.duration, rospy.Duration(0.0))
                     time_stamp = self.listener.getLatestCommonTime(
                         tf_from, tf_to)  # This does return the sim time
                     # print('tf time_stamp: ', time_stamp)
@@ -960,99 +800,3 @@ class preprocessing(object):
         else:
             return input_array
 
-    def get_node_info(self):
-        # Node Marker Pub
-        # sf_node = shapefile.Reader(
-        #     self.hp_map_file_path + "A1_NODE_edit4", encoding='euc-kr')
-        # sf_node = shapefile.Reader(rospy.get_param("hdmap_file_path") + "A1_NODE", encoding='euc-kr')
-        # sf_node = shapefile.Reader(
-        #     self.hp_map_file_path + "A1_NODE_mod", encoding='euc-kr')
-        # sf_node = shapefile.Reader(
-        #     self.hp_map_file_path + "A1_NODE", encoding='utf-8')
-        sf_node = shapefile.Reader(
-            self.hp_map_file_path + "A1_NODE_long2", encoding='euc-kr')
-        print('sf_node : ', sf_node)
-
-        # Get fields (attribute names) from the **.dbf file.
-        # Ignore first field, "DeletionFlag"
-        fields_node = [x[0] for x in sf_node.fields][1:]
-        print('fields_node : ', fields_node)
-
-        # Get records (attribute values) from the **.dbf file.
-        records_node = sf_node.records()
-        # get points from the Shape object.
-        shps_node = [s.points for s in sf_node.shapes()]
-
-        node_dataframe = pd.DataFrame(columns=fields_node, data=records_node)
-        # Add the "coords" filed and "shps" records obtained from .shx
-        node_dataframe = node_dataframe.assign(coords=shps_node)
-
-        if self.hd_map_offset is not None:
-            node_dataframe['coords'] = node_dataframe['coords'].map(
-                lambda x: self.adjust_offset(x))
-
-        print('node_dataframe : ', node_dataframe[0:10])
-        print('node data len : ', len(node_dataframe))
-
-        return node_dataframe
-
-    def get_link_info(self):
-        # Link Marker Pub
-        # sf_link = shapefile.Reader(
-        #     self.hp_map_file_path + "A2_LINK_edit4", encoding='euc-kr')
-        # sf_link = shapefile.Reader(rospy.get_param("hdmap_file_path") + "A2_LINK", encoding='euc-kr')
-        # sf_link = shapefile.Reader(
-        #     self.hp_map_file_path + "A2_LINK", encoding='euc-kr')
-        # sf_link = shapefile.Reader(
-        #     self.hp_map_file_path + "A2_LINK_mod", encoding='euc-kr')
-        # sf_link = shapefile.Reader(
-        #     self.hp_map_file_path + "A2_LINK_edit4", encoding='euc-kr')
-        # sf_link = shapefile.Reader(
-        #     self.hp_map_file_path + "A2_LINK", encoding='utf-8')
-        sf_link = shapefile.Reader(
-            self.hp_map_file_path + "A2_LINK_long2", encoding='euc-kr')
-        print('sf_link : ', sf_link)
-
-        # Get fields (attribute names) from the **.dbf file.
-        # Ignore first field, "DeletionFlag"
-        fields_link = [x[0] for x in sf_link.fields][1:]
-        print('fields_link : ', fields_link)
-
-        # Get records (attribute values) from the **.dbf file.
-        records_link = sf_link.records()
-        # get points from the Shape object.
-        shps_link = [s.points for s in sf_link.shapes()]
-
-        link_dataframe = pd.DataFrame(columns=fields_link, data=records_link)
-        # Add the "coords" filed and "shps" records obtained from .shx
-        link_dataframe = link_dataframe.assign(coords=shps_link)
-
-        # print(link_dataframe.loc[:, 'Length'])
-
-        if self.hd_map_offset is not None:
-            link_dataframe['coords'] = link_dataframe['coords'].map(
-                lambda x: self.adjust_offset(x))
-
-        # print('link_dataframe : ', link_dataframe[0:10])
-        # print('link_dataframe : ', link_dataframe.loc[:, 'Length'])
-        # print('link_dataframe : ', link_dataframe.loc[:, 'ID'])
-        # print('link_dataframe : ', link_dataframe.loc[:, 'R_LinkID'])
-        # print('link_dataframe : ', link_dataframe.loc[:, 'L_LinkID'])
-
-        if self.ignore_link_ids is not None:
-            for each_id in self.ignore_link_ids:
-                print(each_id)
-                match_ind = link_dataframe.index[link_dataframe['ID'] == each_id]
-                print('match_ind : ', match_ind)
-                # change match ind to None
-                link_dataframe.loc[int(match_ind[0]), 'ID'] = None
-                link_dataframe.loc[int(match_ind[0]), 'coords'] = None
-                link_dataframe.loc[int(match_ind[0]), 'FromNodeID'] = None
-                link_dataframe.loc[int(match_ind[0]), 'ToNodeID'] = None
-                # print(each_id)
-                # link_dataframe.replace(each_id, None)
-
-        # print('link_dataframe : ', link_dataframe.loc[:, 'ID'])
-
-        return link_dataframe
-        

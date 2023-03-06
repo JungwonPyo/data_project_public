@@ -14,6 +14,7 @@ samples
 detectron_output
 hrnet_output
 hrnet_log
+hrnet_results
 cmx_log
 *vscode*
 HRNet-Semantic-Segmentation/output

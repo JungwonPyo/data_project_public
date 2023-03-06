@@ -60,9 +60,25 @@ _C.DATASET.DATASET = 'cityscapes'
 _C.DATASET.NUM_CLASSES = 19
 _C.DATASET.RESIZE_SHAPE = [1280, 1920]
 _C.DATASET.RANDOM_SAMPLES = None
+_C.DATASET.USE_JSON = False
 _C.DATASET.TRAIN_SET = 'list/cityscapes/train.lst'
 _C.DATASET.EXTRA_TRAIN_SET = ''
 _C.DATASET.TEST_SET = 'list/cityscapes/val.lst'
+
+_C.DATASET.BACKGROUND_PATH = '/home/kkk/multi-view-tool/cocodataset'
+_C.DATASET.MODEL_IMG_PATH = '/home/kkk/multi-view-tool/data_lmd'
+_C.DATASET.OBJECT_LISTS = [
+        'fireex',
+        'escape',
+        'water_pu',
+        'vending',
+        'information',
+        ]
+_C.DATASET.SCALE_RANGE = [0.5, 1.5]
+_C.DATASET.MAX_OBJECTS = 3
+_C.DATASET.NUM_CLASSES = 5
+_C.DATASET.NUM_SAMPLES = 10000
+_C.DATASET.TEST_MODE = False
 
 # training
 _C.TRAIN = CN()

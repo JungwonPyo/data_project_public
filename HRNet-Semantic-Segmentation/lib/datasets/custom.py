@@ -25,6 +25,7 @@ class Custom(BaseDataset):
                  list_path, 
                  num_samples=None, 
                  random_samples=None,
+                 use_json=False,
                  num_classes=19,
                  multi_scale=True, 
                  flip=True, 
@@ -47,6 +48,8 @@ class Custom(BaseDataset):
         self.multi_scale = multi_scale
         self.flip = flip
         
+        self.use_json = use_json
+        
         self.resize_shape = np.asarray(resize_shape)
         
         self.img_list = [line.strip().split() for line in open(root+list_path)]
@@ -57,23 +60,6 @@ class Custom(BaseDataset):
         if random_samples:
             self.files = random.choices(self.files, k=random_samples)
 
-        # self.label_mapping = {-1: ignore_label, 0: ignore_label, 
-        #                       1: ignore_label, 2: ignore_label, 
-        #                       3: ignore_label, 4: ignore_label, 
-        #                       5: ignore_label, 6: ignore_label, 
-        #                       7: 0, 8: 1, 9: ignore_label, 
-        #                       10: ignore_label, 11: 2, 12: 3, 
-        #                       13: 4, 14: ignore_label, 15: ignore_label, 
-        #                       16: ignore_label, 17: 5, 18: ignore_label, 
-        #                       19: 6, 20: 7, 21: 8, 22: 9, 23: 10, 24: 11,
-        #                       25: 12, 26: 13, 27: 14, 28: 15, 
-        #                       29: ignore_label, 30: ignore_label, 
-        #                       31: 16, 32: 17, 33: 18}
-        # self.class_weights = torch.FloatTensor([0.8373, 0.918, 0.866, 1.0345, 
-        #                                 1.0166, 0.9969, 0.9754, 1.0489,
-        #                                 0.8786, 1.0023, 0.9539, 0.9843, 
-        #                                 1.1116, 0.9037, 1.0865, 1.0955, 
-        #                                 1.0865, 1.1529, 1.0507]).cuda()
         '''
             class_info = {
                 'Wall':                 [134, 187, 113],
@@ -103,7 +89,7 @@ class Custom(BaseDataset):
                 'Stroller':             [78, 15, 210],
                 'Shopping Cart':        [95, 25, 104],
                 'Animal':               [125, 11, 145],
-                'Human':                [88, 28, 38],
+                'Human':                [112, 133, 153],
                 'Undefined Stuff':      [202, 197, 79],
             }
         '''
@@ -138,47 +124,65 @@ class Custom(BaseDataset):
             27: 27, 
             28: 28, 
             }
-        self.class_weights = torch.FloatTensor([
-            1., 1., 1., 1., 1., # -1, 0, 1, 2, 3
-            1., 1., 1., 1., 1., # 4, 5, 6, 7, 8
-            1., 1., 1., 1., 1., # 9, 10, 11, 12, 13
-            1., 1., 1., 1., 1., # 14, 15, 16, 17, 18
-            1., 1., 1., 1., 1., # 19, 20, 21, 22, 23
-            1., 1., 1., 1. # 24, 25, 26, 27
-            ]).cuda()
         # self.class_weights = torch.FloatTensor([
-        #     0.83, 0.9, 1., 1., 1.1, # -1, 0, 1, 2, 3
-        #     1.1, 1., 1., 1.1, 1.2, # 4, 5, 6, 7, 8
-        #     1.2, 1.2, 1.1, 1.1, 1.2, # 9, 10, 11, 12, 13
-        #     1.2, 1., 1.2, 1.1, 1.2, # 14, 15, 16, 17, 18
-        #     1.2, 1.1, 0.9, 1.1, 1.2, # 19, 20, 21, 22, 23
-        #     1.2, 1.2, 1.1, 0.81 # 24, 25, 26, 27
+        #     1., 1., 1., 1., 1., # -1, 0, 1, 2, 3
+        #     1., 1., 1., 1., 1., # 4, 5, 6, 7, 8
+        #     1., 1., 1., 1., 1., # 9, 10, 11, 12, 13
+        #     1., 1., 1., 1., 1., # 14, 15, 16, 17, 18
+        #     1., 1., 1., 1., 1., # 19, 20, 21, 22, 23
+        #     1., 1., 1., 1. # 24, 25, 26, 27
         #     ]).cuda()
+        self.class_weights = torch.FloatTensor([
+            0.83, 0.9, 1., 1., 1.1, # -1, 0, 1, 2, 3
+            1.1, 1., 1., 1.1, 1.2, # 4, 5, 6, 7, 8
+            1.2, 1.2, 1.1, 1.1, 1.2, # 9, 10, 11, 12, 13
+            1.2, 1., 1.2, 1.1, 1.2, # 14, 15, 16, 17, 18
+            1.2, 1.1, 0.9, 1.1, 1.2, # 19, 20, 21, 22, 23
+            1.2, 1.2, 1.1, 0.81 # 24, 25, 26, 27
+            ]).cuda()
     
     def read_files(self):
         files = []
         if 'test' in self.list_path:
             for item in self.img_list:
-                # image_path = item
-                # name = os.path.splitext(os.path.basename(image_path[0]))[0]
-                image_path, label_path = item
-                name = os.path.splitext(os.path.basename(label_path))[0]
-                files.append({
-                    "img": image_path,
-                    "label": label_path,
-                    "name": name,
-                })
+                if self.use_json:
+                    image_path, label_path, json_path = item
+                    name = os.path.splitext(os.path.basename(label_path))[0]
+                    files.append({
+                        "img": image_path,
+                        "label": label_path,
+                        "json": json_path,
+                        "name": name,
+                    })
+                else:
+                    image_path, label_path, _ = item
+                    name = os.path.splitext(os.path.basename(label_path))[0]
+                    files.append({
+                        "img": image_path,
+                        "label": label_path,
+                        "name": name,
+                    })
         else:
             for item in self.img_list:
-                # print(item)
-                image_path, label_path = item
-                name = os.path.splitext(os.path.basename(label_path))[0]
-                files.append({
-                    "img": image_path,
-                    "label": label_path,
-                    "name": name,
-                    "weight": 1
-                })
+                if self.use_json:
+                    image_path, label_path, json_path = item
+                    name = os.path.splitext(os.path.basename(label_path))[0]
+                    files.append({
+                        "img": image_path,
+                        "label": label_path,
+                        "json": json_path,
+                        "name": name,
+                        "weight": 1
+                    })
+                else:
+                    image_path, label_path, _ = item
+                    name = os.path.splitext(os.path.basename(label_path))[0]
+                    files.append({
+                        "img": image_path,
+                        "label": label_path,
+                        "name": name,
+                        "weight": 1
+                    })
         return files
         
     def convert_label(self, label, inverse=False):
@@ -194,8 +198,6 @@ class Custom(BaseDataset):
     def __getitem__(self, index):
         item = self.files[index]
         name = item["name"]
-        # image = cv2.imread(os.path.join(self.root,'cityscapes',item["img"]),
-        #                    cv2.IMREAD_COLOR) 
         image = cv2.imread(os.path.join(self.root, item["img"]),
                            cv2.IMREAD_COLOR)
         
@@ -211,26 +213,31 @@ class Custom(BaseDataset):
             
             image = self.input_transform(image)
             image = image.transpose((2, 0, 1))
-
-            # label = cv2.imread(os.path.join(self.root, item["label"]),
-            #                cv2.IMREAD_GRAYSCALE)
-            # label = self.convert_label(label)
-            label = make_one_gray_mask(os.path.join(
-                self.root, item["label"]), self.resize_shape)
+            
+            if self.use_json:
+                label = make_one_gray_mask(
+                    os.path.join(self.root, item["label"]), 
+                    self.resize_shape, 
+                    os.path.join(self.root, item["json"]),
+                    )
+            else:
+                label = make_one_gray_mask(os.path.join(
+                    self.root, item["label"]), self.resize_shape)
             label = self.convert_label(label)
 
             return image.copy(), label.copy(), np.array(size), name
 
-        # label = cv2.imread(os.path.join(self.root,'cityscapes',item["label"]),
-        #                    cv2.IMREAD_GRAYSCALE)
-        # label = cv2.imread(os.path.join(self.root, item["label"]),
-        #                    cv2.IMREAD_GRAYSCALE)
-        # label = self.convert_label(label)
-        
         size = image.shape
         
-        label = make_one_gray_mask(os.path.join(
-            self.root, item["label"]), self.resize_shape)
+        if self.use_json:
+            label = make_one_gray_mask(
+                os.path.join(self.root, item["label"]), 
+                self.resize_shape, 
+                os.path.join(self.root, item["json"]),
+                )
+        else:
+            label = make_one_gray_mask(os.path.join(
+                self.root, item["label"]), self.resize_shape)
         label = self.convert_label(label)
 
         image, label = self.gen_sample(image, label, 

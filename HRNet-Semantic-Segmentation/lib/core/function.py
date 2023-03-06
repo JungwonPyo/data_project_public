@@ -51,6 +51,7 @@ def train(config, epoch, num_epoch, epoch_iters, base_lr,
 
     for i_iter, batch in enumerate(trainloader, 0):
         images, labels, _, _ = batch
+        # print(images.size(), labels.size())
         images = images.cuda()
         labels = labels.long().cuda()
 
@@ -151,6 +152,8 @@ def validate(config, testloader, model, writer_dict):
 
 def testval_custom(config, test_dataset, testloader, model,
             sv_dir='', sv_pred=False):
+    if not os.path.exists(sv_dir):
+        os.mkdir(sv_dir)
     model.eval()
     confusion_matrix = np.zeros(
         (config.DATASET.NUM_CLASSES, config.DATASET.NUM_CLASSES))
