@@ -20,19 +20,16 @@ C.abs_dir = osp.realpath(".")
 """Dataset Path"""
 C.dataset_name = 'custom'
 C.dataset_path = '/media/kkk/T7_Shield_2'
-# C.rgb_root_folder = osp.join(C.dataset_path, 'img')
 C.rgb_root_folder = osp.join(C.dataset_path, 'de_front')
 C.rgb_format = '.jpg'
-# C.gt_root_folder = osp.join(C.dataset_path, 'gray_mask')
-# C.gt_root_folder = osp.join(C.dataset_path, 'mask')
 C.gt_root_folder = osp.join(C.dataset_path, 'mask_front')
 C.gt_format = '.png'
 C.gt_transform = False
+C.json_root_folder = osp.join(C.dataset_path, 'seg_front')
+C.json_format = '.json'
+C.use_json = True
 # True when label 0 is invalid, you can also modify the function _transform_gt in dataloader.RGBXDataset
 # True for most dataset valid, Faslse for MFNet(?)
-# C.x_root_folder = osp.join(C.dataset_path, 'lidar_projected')
-# C.x_format = '.png'
-# C.x_root_folder = osp.join(C.dataset_path, 'lidar')
 C.x_root_folder = osp.join(C.dataset_path, 'lidar_front')
 C.x_format = '.pcd'
 C.x_is_single_channel = False # True for raw depth, thermal and aolp/dolp(not aolp/dolp tri) input
@@ -45,10 +42,8 @@ C.test_source = osp.join(C.dataset_path, "test.txt")
 C.resize_shape = np.array([1280, 1920])
 
 C.is_test = False
-# C.num_train_imgs = 1545
-# C.num_eval_imgs = 660
-C.num_train_imgs = 40823
-C.num_eval_imgs = 2
+C.num_train_imgs = 10169 # Restricted because of the memory
+C.num_eval_imgs = 1000
 C.num_classes = 29
 C.class_names = [
     'Wall',
@@ -92,9 +87,6 @@ C.log_dir = osp.abspath('cmx_log')
 
 """ Settings for network, this would be different for each kind of model"""
 C.backbone = 'mit_b5' # Remember change the path below.
-# C.pretrained_model = C.root_dir + '/checkpoints/segformers/mit_b2.pth'
-# C.pretrained_model = C.root_dir + '/checkpoints/segformers/mit_b5.pth'
-# C.pretrained_model = C.log_dir + '/checkpoint/epoch-last.pth'
 C.pretrained_model = '/home/kkk/data_project/cmx_log/submit/cmx_submit_checkpoint.pth'
 C.decoder = 'MLPDecoder'
 C.decoder_embed_dim = 512
@@ -130,7 +122,7 @@ C.nepochs = 100
 C.niters_per_epoch = C.num_train_imgs // C.batch_size  + 1
 C.num_workers = 8
 C.train_scale_array = [0.5, 0.75, 1, 1.25, 1.5, 1.75]
-C.warm_up_epoch = 1
+C.warm_up_epoch = 0
 
 C.fix_bias = True
 C.bn_eps = 1e-3
@@ -156,4 +148,3 @@ if __name__ == '__main__':
 
     if args.tensorboard:
         open_tensorboard()
-

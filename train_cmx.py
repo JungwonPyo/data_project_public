@@ -25,7 +25,7 @@ from utils.init_func import init_weight, group_weight
 from utils.lr_policy import WarmUpPolyLR
 from engine.engine import Engine
 from engine.logger import get_logger
-from utils.pyt_utils import all_reduce_tensor
+from utils.pyt_utils import load_model, all_reduce_tensor
 sys.path.remove(cmx_repo_path)
 
 from tensorboardX import SummaryWriter
@@ -67,6 +67,9 @@ with Engine(custom_parser=parser) as engine:
         BatchNorm2d = nn.BatchNorm2d
     
     model=segmodel(cfg=config, criterion=criterion, norm_layer=BatchNorm2d)
+
+    if config.pretrained_model is not None:
+        model = load_model(model, config.pretrained_model)
     
     # group weight and config optimizer
     base_lr = config.lr

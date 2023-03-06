@@ -19,6 +19,9 @@ class RGBXDataset(data.Dataset):
         self._gt_path = setting['gt_root']
         self._gt_format = setting['gt_format']
         self._transform_gt = setting['transform_gt']
+        self._json_path = setting['json_root']
+        self._json_format = setting['json_format']
+        self._use_json = setting['use_json']
         self._x_path = setting['x_root']
         self._x_format = setting['x_format']
         self._x_single_channel = setting['x_single_channel']
@@ -62,6 +65,7 @@ class RGBXDataset(data.Dataset):
         rgb_path = os.path.join(self._rgb_path, item_name + self._rgb_format)
         x_path = os.path.join(self._x_path, item_name + self._x_format)
         gt_path = os.path.join(self._gt_path, item_name + self._gt_format)
+        json_path = os.path.join(self._json_path, item_name + self._json_format)
 
         # Check the following settings if necessary
         rgb = self._open_image(rgb_path, cv2.COLOR_BGR2RGB)
@@ -82,16 +86,18 @@ class RGBXDataset(data.Dataset):
                 (self.resize_shape[1], self.resize_shape[0])
             )
 
-        # gt = self._open_image(gt_path, cv2.IMREAD_GRAYSCALE, dtype=np.uint8)
-        gt = make_one_gray_mask(gt_path, self.resize_shape)
+        if self._use_json:
+            gt = make_one_gray_mask(
+                gt_path, 
+                self.resize_shape,
+                json_path
+                )
+        else:
+            gt = make_one_gray_mask(gt_path, self.resize_shape)
+
         if self._transform_gt:
             gt = self._gt_transform(gt) 
 
-        # if self._x_single_channel:
-        #     x = self._open_image(x_path, cv2.IMREAD_GRAYSCALE)
-        #     x = cv2.merge([x, x, x])
-        # else:
-        #     x =  self._open_image(x_path, cv2.COLOR_BGR2RGB)
         
         if self.preprocess is not None:
             rgb, gt, x = self.preprocess(rgb, gt, x)
