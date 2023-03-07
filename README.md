@@ -81,7 +81,8 @@ To change testing configs, see [this](configs/cmx_config_custom.py)
 ### Testing
 
 ```bash
-python test_cmx.py
+---python test_cmx.py---
+python test_cmx.py -p ./cmx_log/result_images_2
 ```
 
 
